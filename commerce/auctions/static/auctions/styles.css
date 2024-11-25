@@ -3,6 +3,20 @@ body {
 }
 .hein{ padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; } 
 .hein:hover { background-color: #0056b3; }
+.khant {
+    padding: 10px 20px;
+    background-color: #ff0000; /* Changed to red */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.khant:hover {
+    background-color: #cc0000; /* Darker red for hover effect */
+}
+
 .container {
     display: flex;
     gap: 20px; /* Space between the divs */
