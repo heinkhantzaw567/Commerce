@@ -1,0 +1,59 @@
+body {
+    padding: 10px;
+}
+.hein{ padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; } 
+.hein:hover { background-color: #0056b3; }
+.container {
+    display: flex;
+    gap: 20px; /* Space between the divs */
+    align-items: center; /* Aligns items vertically */
+    border: 2px solid #ddd; /* Adds a border */
+    border-radius: 10px; /* Rounds the corners */
+    padding: 20px; /* Adds space inside the container */
+    background-color: #f9f9f9; /* Optional: Adds a light background */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+    max-width: 800px; /* Restricts the container width */
+    margin: 20px auto; /* Centers the container */
+}
+.image-container {
+    flex: 1; /* Adjusts width dynamically */
+}
+.details-container {
+    flex: 2; /* Adjusts width dynamically */
+}
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.form-control::placeholder {
+    color: #aaa;
+    opacity: 1;
+}
+
+.form-control:disabled, .form-control[readonly] {
+    background-color: #f7f7f7;
+    opacity: 1;
+}
+
+input[type="submit"] { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; } input[type="submit"]:hover { background-color: #0056b3; }
+
+.listing-container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); } h1 { font-size: 2em; color: #333; margin-bottom: 10px; } 
+.listing-image { text-align: center; margin-bottom: 20px; } 
+.listing-image img { max-width: 100%; height: auto; border-radius: 8px; } 
+.listing-details { margin-bottom: 20px; } 
+.listing-details h3 { font-size: 1.5em; color: #555; margin-bottom: 10px; } .listing-details ul { list-style-type: none; padding: 0; } .listing-details ul li { margin-bottom: 5px; } .listing-details ul li::before { content: "•"; color: #007bff; display: inline-block; width: 1em; margin-left: -1em; }

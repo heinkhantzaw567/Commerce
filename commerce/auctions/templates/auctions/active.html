@@ -1,0 +1,38 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    
+<div class="listing-container">
+    <h1>Listing: {{ listing.title }}</h1>
+    <div class="listing-image"> <img src="{{ listing.image_url }}" alt="Listing Image"> </div>
+    <div class="listing-details">
+        <p> {{ listing.description }}</p>
+        
+        
+        {% if current_bid %}
+            <p>Price: $ {{ current_bid.bid_price }}</p>
+        {% else %}
+            <p>Price: $ {{ listing.starting_bid }}</p>
+        {% endif %}
+       
+       
+        <form class="form-container" method="post" id="my_form">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="action">
+            <p>{{ count }} bid(s) so far. Your bid is the current bid.</p>
+            {{ form }}
+            <input type="submit" value="Place Bid" onclick="document.getElementById('action').value = 'bid'">
+            <button type="button" class="hein" onclick="document.getElementById('action').value = '{{ place }}'; document.getElementById('my_form').submit();">{{ place }}</button>
+        </form>
+    </div>
+    <div class="listing-details">
+       <h3>Details</h3>
+       <ul>
+          <li>Listed by: {{ listing.user_id }}</li>
+          <li>Category: {{ listing.element }}</li>
+       </ul>
+    </div>
+ </div>
+{% endblock body %}
+    
+   
