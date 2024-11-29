@@ -5,7 +5,7 @@
 <h2> Categories </h2>
 <form action="{% url 'auctions:categories' %}" method="post">
     {% csrf_token %}
-        <select name ="element" class="form-select form-select-sm" aria-label="Small select example" >
+        <select name ="element" class="form-select" aria-label="Small select example" >
             
             {% for id in elements %}
                <option value="{{ id.element }}">{{ id.element }}</option>
