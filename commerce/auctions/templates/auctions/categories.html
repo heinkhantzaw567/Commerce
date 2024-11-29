@@ -1,9 +1,21 @@
 {% extends "auctions/layout.html" %}
 
+
 {% block body %}
-    <h2>Active Listings</h2>
-    
-    {% for listing in listings %}
+<h2> Categories </h2>
+<form action="{% url 'auctions:categories' %}" method="post">
+    {% csrf_token %}
+        <select name ="element" class="styled-select">
+            
+            {% for id in elements %}
+               <option value="{{ id.element }}">{{ id.element }}</option>
+            {% endfor %}
+                
+        </select>
+        <input type="submit">
+</form>
+
+{% for listing in listings %}
     <div class="container">
         <!-- Image Section -->
         <div class="image-container">
@@ -14,17 +26,17 @@
         <div class="details-container">
             <h2>
                 <a href="{% url 'auctions:detail' listing.id %}">
-                  {{ listing.title }}
+                    {{ listing.title }}
                 </a>
-              </h2>
-            
+            </h2>
             <p><strong>Price:</strong> ${{ listing.starting_bid }}</p>
             <p>Created {{ listing.created_time }}</p>
-            
         </div>
     </div>
-    {% endfor %}
-        
+{% empty %}
+    <div></div>
+{% endfor %}
+
+
+{% endblock body %}
     
-    
-{% endblock %}

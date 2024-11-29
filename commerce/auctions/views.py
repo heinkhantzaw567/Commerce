@@ -212,3 +212,17 @@ def watchlist(request):
                    {
                        "listings":listing
                    })
+
+def categories(request):
+    elements = AuctionListing.objects.values('element').distinct()
+    if request.method == "POST":
+        listings = AuctionListing.objects.filter(element=request.POST["element"])
+        print(listings)
+        return render (request, "auctions/categories.html",
+                       {"elements":elements,
+                       "listings":listings})
+    
+    
+    return render (request, "auctions/categories.html",
+                    {"elements":elements,
+                        "listings":None})
