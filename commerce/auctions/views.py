@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User,AuctionListing,Bid,Watchlists
+from .models import User,AuctionListing,Bid,Watchlists,Comment,Winner
 from django import forms
 
 class CreateListing(forms.Form):
@@ -29,18 +29,31 @@ class CreateListing(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter element'})
     )
 
+class CommentForm(forms.Form): # comment input form:
+    comment = forms.CharField(max_length=400,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Comment'}))
+
 
 class BidForm(forms.Form):
     bid_price =forms.DecimalField(max_digits=10, decimal_places=2,
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Bid'})
     )
 def index(request):
-
-    return render(request, "auctions/index.html",
+    print(request.user)
+    if request.user:
+        winners = Winner.objects.filter(user=request.user)
+        print(winners)
+        return render(request, "auctions/index.html",
+                    {
+                        "listings":AuctionListing.objects.all(),
+                        "winners" : winners
+                    })
+    else:
+        
+        return render(request, "auctions/index.html",
                   {
-                      "listings":AuctionListing.objects.all()
+                      "listings":AuctionListing.objects.all(),
+                      "winners" : ""
                   })
-
 
 def login_view(request):
     if request.method == "POST":
@@ -118,56 +131,97 @@ def active(request, auction_id):
     bids = Bid.objects.filter(auction=listing).order_by('-bid_price').first()  
     countingbids = Bid.objects.filter(auction=listing).count()
     value = Watchlists.objects.filter(auction=auction_id, user=request.user).count()  
-    if value  ==0:
+    owner = AuctionListing.objects.filter(user_id=request.user, id=auction_id)
+    Comments = Comment.objects.filter(auction=listing)
+    if value  == 0:
         place = "watchlist"
     else: 
         place ="remove"
-    print(place)
+    
     if request.method == "POST":
+        form_type = request.POST.get('form_type')
+        
         form = BidForm(request.POST)
         action = request.POST.get('action')
+        print(action)
         
-        print(place)
+        
         if request.user.is_anonymous:
                 return render (request, "auctions/active.html",{
                                     "listing":listing,
                                     "form": BidForm(),
                                     "current_bid":bids,
                                     "count":countingbids,
-                                    "place":place
+                                    "place":place,
+                                    "owner":owner,
+                                    "comment": CommentForm(),
+                                    "comments": Comments
                                     })
-        if action == 'bid':
-            price = listing.starting_bid
-            if bids is not None :
-                    price = bids.bid_price
+        if action == 'close':
             
-            if form.is_valid():
-                if price >= form.cleaned_data['bid_price'] :
-                    return render (request, "auctions/active.html",{
-                                    "listing":listing,
-                                    "form": BidForm(),
-                                    "current_bid":bids,
-                                    "count":countingbids,
-                                    "place":"remove",
-                                    "place":place
-                                    })
-                bid = Bid(
+            print(bids)
+            print(listing)
+            winner = Winner(
+                user = bids.user,
+                auction_name = listing.title
+            )
+            winner.save()
+            owner.delete()
+
+            return HttpResponseRedirect(reverse('auctions:index'))
+        if  form_type == 'bids':
+            if action == 'bid':
+                price = listing.starting_bid
+                if bids is not None :
+                        price = bids.bid_price
+                
+                if form.is_valid():
+                    if price >= form.cleaned_data['bid_price'] :
+                        return render (request, "auctions/active.html",{
+                                        "listing":listing,
+                                        "form": BidForm(),
+                                        "current_bid":bids,
+                                        "count":countingbids,
+                                        "place":"remove",
+                                        "place":place,
+                                        "owner":owner,
+                                        "comment": CommentForm(),
+                                        "comments": Comments
+                                        })
+                    bid = Bid(
+                        user = request.user,
+                        auction = listing,
+                        bid_price = form.cleaned_data['bid_price']
+                    )
+                    listing.starting_bid = form.cleaned_data['bid_price']
+                    listing.save()
+                    bid.save()
+                    return HttpResponseRedirect(reverse("auctions:index"))
+                
+                return render (request, "auctions/active.html",{
+                                        "listing":listing,
+                                        "form": BidForm(),
+                                        "current_bid":bids,
+                                        "count":countingbids,
+                                        "place":place,
+                                        "owner":owner,
+                                        "comment": CommentForm(),
+                                        "comments": Comments
+                                        }) 
+        if form_type == 'comments':
+            
+            commentform = CommentForm(request.POST)
+            
+            if commentform.is_valid():
+                ex =commentform.cleaned_data['comment']
+                print(ex)
+                comments = Comment(
                     user = request.user,
                     auction = listing,
-                    bid_price = form.cleaned_data['bid_price']
+                    comment = commentform.cleaned_data['comment']
                 )
-                listing.starting_bid = form.cleaned_data['bid_price']
-                listing.save()
-                bid.save()
+                comments.save()
                 return HttpResponseRedirect(reverse("auctions:index"))
-            
-            return render (request, "auctions/active.html",{
-                                    "listing":listing,
-                                    "form": BidForm(),
-                                    "current_bid":bids,
-                                    "count":countingbids,
-                                    "place":place
-                                    }) 
         if action == 'watchlist':
             
             
@@ -182,7 +236,10 @@ def active(request, auction_id):
                                     "form": BidForm(),
                                     "current_bid":bids,
                                     "count":countingbids,
-                                   "place":"remove"
+                                   "place":"remove",
+                                   "owner":owner,
+                                   "comment": CommentForm(),
+                                   "comments": Comments
                                     })
         if action == 'remove':
             watch =Watchlists.objects.filter(auction=auction_id, user=request.user)
@@ -192,7 +249,9 @@ def active(request, auction_id):
                                     "form": BidForm(),
                                     "current_bid":bids,
                                     "count":countingbids,
-                                    "place":"watchlist"
+                                    "place":"watchlist",
+                                    "comment": CommentForm(),
+                                    "comments": Comments
                                     })
                                       
             
@@ -202,7 +261,10 @@ def active(request, auction_id):
         "form": BidForm(),
         "current_bid":bids,
         "count":countingbids,
-        "place":place
+        "place":place,
+        "owner":owner,
+        "comment": CommentForm(),
+        "comments": Comments
         })
 
 def watchlist(request):

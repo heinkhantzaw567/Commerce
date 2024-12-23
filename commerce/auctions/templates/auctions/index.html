@@ -1,6 +1,15 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    {% if winners %}
+    {% for winner in winners %}
+    <div class="alert alert-primary" role="alert">       
+            YOU WIN THE AUCTION OF {{ winner.auction_name }}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div></div>
+    {% endif %}
     <h2>Active Listings</h2>
     
     {% for listing in listings %}

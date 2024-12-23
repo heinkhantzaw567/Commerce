@@ -2,7 +2,9 @@
 
 {% block body %}
     
+
 <div class="listing-container">
+    
     <h1>Listing: {{ listing.title }}</h1>
     <div class="listing-image"> <img src="{{ listing.image_url }}" alt="Listing Image"> </div>
     <div class="listing-details">
@@ -18,8 +20,9 @@
        
         <form class="form-container" method="post" id="my_form">
             {% csrf_token %}
-            <input type="hidden" name="action" id="action">
+            <input type="hidden" name="action" id="action" >
             <p>{{ count }} bid(s) so far. Your bid is the current bid.</p>
+            <input type="hidden" value="bids" name="form_type">
             {{ form }}
             <input type="submit" value="Place Bid" onclick="document.getElementById('action').value = 'bid'">
             {%  if place == "remove" %}
@@ -27,6 +30,9 @@
             <button type="button" class="khant" onclick="document.getElementById('action').value = '{{ place }}'; document.getElementById('my_form').submit();">{{ place }}</button>
             {% else %}
                 <button type="button" class="hein" onclick="document.getElementById('action').value = '{{ place }}'; document.getElementById('my_form').submit();">{{ place }}</button>
+            {% endif %}
+            {% if owner %}
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('action').value = 'close'; document.getElementById('my_form').submit();">Close Listing</button>
             {% endif %}
         </form>
     </div>
@@ -36,6 +42,34 @@
           <li>Listed by: {{ listing.user_id }}</li>
           <li>Category: {{ listing.element }}</li>
        </ul>
+    </div>
+    <div>
+       <form class="form-container" method="post" id="my_form">
+            {% csrf_token %}
+            <input type="hidden" value="comments" name="form_type">
+            {{ comment }}
+            <input type="submit">
+        </form>
+    </div>
+    <div>
+        <h3>Comments</h3>
+    
+        {% if comments %}
+            <div class="list-group">
+                {% for comment in comments %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-1">{{ comment.user }}</h5>
+                           
+                        </div>
+                        <p class="mb-1">{{ comment.comment }}</p>
+                        
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No comments yet. Be the first to comment!</p>
+        {% endif %}
     </div>
  </div>
 {% endblock body %}

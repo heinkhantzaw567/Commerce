@@ -40,3 +40,8 @@ class Comment(models.Model):
 class Watchlists(models.Model):
     auction = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name="watchlist_id")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist_user")
+
+
+class Winner(models.Model):
+    user =models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner_user")
+    auction_name = models.CharField(max_length=200)
